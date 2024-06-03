@@ -1,1 +1,0 @@
-{"version":3,"file":"commonScreeningRequest.entity.js","sourceRoot":"","sources":["../../../../src/alert/entities/Screening/commonScreeningRequest.entity.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qCAAiE;AA8B1D,IAAM,sBAAsB,GAA5B,MAAM,sBAAsB;CAkClC,CAAA;AAlCY,wDAAsB;AAGjC;IADC,IAAA,gCAAsB,GAAE;;kDACd;iCAHA,sBAAsB;IADlC,IAAA,gBAAM,GAAE;GACI,sBAAsB,CAkClC"}
