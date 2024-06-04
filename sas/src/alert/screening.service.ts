@@ -16,19 +16,19 @@ const CALLBACK : string = "Callback";
 export class ScreeningService {
 
   constructor(
-    @InjectRepository(NameScreeningRequest)
-    private nameScreeningRequestRepository: Repository<NameScreeningRequest>,
+    // @InjectRepository(NameScreeningRequest)
+    // private nameScreeningRequestRepository: Repository<NameScreeningRequest>,
     private workflowService: WorkflowService
     
   ) {}
 
-  findAll(): Promise<NameScreeningRequest[]> {
-    return this.nameScreeningRequestRepository.find();
-  }
+  // findAll(): Promise<NameScreeningRequest[]> {
+  //   return this.nameScreeningRequestRepository.find();
+  // }
 
-  async remove(id: number): Promise<void> {
-    await this.nameScreeningRequestRepository.delete(id);
-  }
+  // async remove(id: number): Promise<void> {
+  //   await this.nameScreeningRequestRepository.delete(id);
+  // }
 
   createNameScreeningResponse(nameScreeningRequest: NameScreeningRequest): NameScreeningResponse {
     

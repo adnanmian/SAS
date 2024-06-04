@@ -26,14 +26,24 @@ export class WorkflowService {
     }
 
     private addInterval(name: string, milliseconds: number, callbackEndPoint : string, notification: Notification) {
+        
         const callback = async () => {
+
+          try {
           this.logger.warn(`Interval ${name} executing at time (${milliseconds})!`);
 
             console.log(`calling timer name ${ name }`);
             const response: AxiosResponse = await this.httpService.post(callbackEndPoint, notification)
                 .toPromise();
+          } catch (error) {
+            this.logger.error(`Failed to call the ESB at ${ callbackEndPoint}` );
+            this.logger.error(`Message  ${ error }` );
+          }     
             this.deleteInterval(name);
         };
+       
+
+
         const interval = setInterval(callback, milliseconds);
         this.schedulerRegistry.addInterval(name, interval);
       }
