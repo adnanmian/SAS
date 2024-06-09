@@ -66,20 +66,19 @@ export class ScreeningService {
           alertDetails:  []
         }; 
         
-        nameScreeningRequest.orderingSenderCustomer.map((customer: Customer) => {
-          
-          // matchDetail.matchFound = this.hitNoHit();
-          // if (matchDetail.matchFound === 'HIT') {
-          console.log(`Customer Name ${ customer.fullName}`);
-          matchDetails.uid = customer.uid;
-        
+
+        if (nameScreeningRequest.orderingSenderCustomer !== undefined){
+
+
+          const customer = nameScreeningRequest.orderingSenderCustomer;
+
           if (this.hitNoHit() === 'HIT') { 
-            
-            matchDetails.matchFound = 'HIT'
+
             hit = true;
+
+            matchDetails.matchFound = 'HIT'
             matchDetails.maxScore = this.score();
             
-          
             const alertDetail = new AlertDetails();
             alertDetail.scannedName = customer.fullName;
             alertDetail.matchedName = customer.fullName;
@@ -107,11 +106,70 @@ export class ScreeningService {
               }
               notification.pepReview.push(pepReview);
             }
+          
+              const metadata = this.findMetaDataByName(nameScreeningRequest.sasHeader.metaData, CALLBACK);
+              if (metadata) {
+                console.log(`Found object: ${metadata.name} - ${metadata.value}`);
+                notification.alertdecision = this.alertDecision();
+                this.workflowService.callESBAfterinterval(nameScreeningRequest.sasHeader.uniqueTxnRefNo,
+                    metadata.value, notification);
+              } else {
+                console.log("Object not found");
+              }
           }
-          // return matchDetails;
-        });
-      
-        if (hit){
+        }
+
+        if ( nameScreeningRequest.beneficiaryReceiverCustomer !== undefined) {
+
+                nameScreeningRequest.beneficiaryReceiverCustomer.map((customer: Customer) => {
+                
+                  // matchDetail.matchFound = this.hitNoHit();
+                  // if (matchDetail.matchFound === 'HIT') {
+                  console.log(`Customer Name ${ customer.fullName}`);
+                  matchDetails.uid = customer.uid;
+                
+                  if (this.hitNoHit() === 'HIT') { 
+                    
+                    matchDetails.matchFound = 'HIT'
+                    hit = true;
+                    matchDetails.maxScore = this.score();
+                  
+                    const alertDetail = new AlertDetails();
+                    alertDetail.scannedName = customer.fullName;
+                    alertDetail.matchedName = customer.fullName;
+                    alertDetail.uidSerialNo = this.serialNumber();
+                    alertDetail.matchScore = this.score();
+                    if (alertDetail.matchScore > matchDetails.maxScore){
+                      matchDetails.maxScore = alertDetail.matchScore;
+                    }
+                    alertDetail.pepFlag = this.pepFlag();
+                    alertDetail.watchlistName = this.watchlist();
+                    alertDetail.keyword = "PEP~EU~UN~";
+        
+                    matchDetails.details.alertDetails.push(alertDetail);
+                    matchDetails.description = "";
+                    // for notification
+                    if (alertDetail.pepFlag === 'Y'){
+                        // notification.pepReview = 
+                        var pepReview : PepReview =
+                        {
+                          uid: customer.uid,
+                          idNumber: customer.idNumber,
+                          idType: customer.idType,
+                          reviewFlag: alertDetail.pepFlag,
+                          pepFlag: alertDetail.pepFlag
+                      }
+                      notification.pepReview.push(pepReview);
+                    }
+                  }
+                  // return matchDetails;
+                });
+        }
+
+        
+
+
+        if (matchDetails.details.alertDetails.length > 0){
           const metadata = this.findMetaDataByName(nameScreeningRequest.sasHeader.metaData, CALLBACK);
           if (metadata) {
             console.log(`Found object: ${metadata.name} - ${metadata.value}`);
@@ -129,6 +187,13 @@ export class ScreeningService {
       } catch (e) {
         console.log(e.message);  
       }
+
+
+
+
+
+
+
     return response;
   }
 

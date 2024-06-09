@@ -13,7 +13,7 @@ export class NameScreeningRequest {
 
   // @Column('json', { array: true })
   @Column({ type: 'json', nullable: true })
-  orderingSenderCustomer: Customer[];
+  orderingSenderCustomer: Customer;
 
   // @Column('json', { array: true })
   @Column({ type: 'json', nullable: true })

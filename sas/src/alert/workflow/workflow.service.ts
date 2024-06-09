@@ -14,8 +14,9 @@ export class WorkflowService {
 
     constructor(
         private readonly httpService: HttpService,
-        private schedulerRegistry: SchedulerRegistry,
-        private logger: Logger
+        private schedulerRegistry: SchedulerRegistry
+        // ,
+        // private logger: Logger
     ) {}
 
     callESBAfterinterval(uniqueTxnRefNo : string, callbackEndPoint : string, notification: Notification){
@@ -30,14 +31,14 @@ export class WorkflowService {
         const callback = async () => {
 
           try {
-          this.logger.warn(`Interval ${name} executing at time (${milliseconds})!`);
+            console.log(`Interval ${name} executing at time (${milliseconds})!`);
 
             console.log(`calling timer name ${ name }`);
             const response: AxiosResponse = await this.httpService.post(callbackEndPoint, notification)
                 .toPromise();
           } catch (error) {
-            this.logger.error(`Failed to call the ESB at ${ callbackEndPoint}` );
-            this.logger.error(`Message  ${ error }` );
+            console.error(`Failed to call the ESB at ${ callbackEndPoint}` );
+            console.error(`Message  ${ error }` );
           }     
             this.deleteInterval(name);
         };
@@ -51,7 +52,9 @@ export class WorkflowService {
       deleteInterval(name: string) {
         if (this.schedulerRegistry.doesExist('interval',name) ){
           this.schedulerRegistry.deleteInterval(name);
-          this.logger.warn(`Timeout ${name} deleted!`);
+          // this.logger.warn(`Timeout ${name} deleted!`);
+          console.warn(`Timeout ${name} deleted!`);
+          
         }
       
       }
