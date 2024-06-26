@@ -93,6 +93,7 @@ export class MatchDetails {
     alertId: string;
     alertDetails: AlertDetails[];
   };
+  status: string;
   errorCode: string;
   errorMessage: string;
   description: string;

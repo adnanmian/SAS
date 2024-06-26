@@ -35,154 +35,158 @@ export class ScreeningService {
     var hit: boolean = false;
     const response = new NameScreeningResponse();
     try {
-        response.sasHeader = new SasHeader();
-        response.sasHeader.zoneId = nameScreeningRequest.sasHeader.zoneId;
-        response.sasHeader.regionCode = nameScreeningRequest.sasHeader.regionCode;
-        response.sasHeader.branchId = nameScreeningRequest.sasHeader.branchId;
-        response.sasHeader.departmentId = nameScreeningRequest.sasHeader.departmentId;
-        response.sasHeader.userGroup = nameScreeningRequest.sasHeader.userGroup;
-        response.sasHeader.channelId = nameScreeningRequest.sasHeader.channelId;
-        response.sasHeader.applicationId = nameScreeningRequest.sasHeader.applicationId;
-        response.sasHeader.applicationModule = nameScreeningRequest.sasHeader.applicationModule;
-        response.sasHeader.uniqueTxnRefNo = nameScreeningRequest.sasHeader.uniqueTxnRefNo;
-        response.sasHeader.messageType = nameScreeningRequest.sasHeader.messageType;
-        response.sasHeader.sysId = nameScreeningRequest.sasHeader.sysId;
-        response.sasHeader.timestamp = nameScreeningRequest.sasHeader.timestamp;
-        // response.sasHeader.userId = nameScreeningRequest.sasHeader.userId;
-        response.sasHeader.metaData = nameScreeningRequest.sasHeader.metaData.map((item: any) => ({
-          name: item.name,
-          value: item.value,
-        }));
-    
-        const notification = new Notification();
-        notification.sasHeader = nameScreeningRequest.sasHeader;
+          response.sasHeader = new SasHeader();
+          response.sasHeader.zoneId = nameScreeningRequest.sasHeader.zoneId;
+          response.sasHeader.regionCode = nameScreeningRequest.sasHeader.regionCode;
+          response.sasHeader.branchId = nameScreeningRequest.sasHeader.branchId;
+          response.sasHeader.departmentId = nameScreeningRequest.sasHeader.departmentId;
+          response.sasHeader.userGroup = nameScreeningRequest.sasHeader.userGroup;
+          response.sasHeader.channelId = nameScreeningRequest.sasHeader.channelId;
+          response.sasHeader.applicationId = nameScreeningRequest.sasHeader.applicationId;
+          response.sasHeader.applicationModule = nameScreeningRequest.sasHeader.applicationModule;
+          response.sasHeader.uniqueTxnRefNo = nameScreeningRequest.sasHeader.uniqueTxnRefNo;
+          response.sasHeader.messageType = nameScreeningRequest.sasHeader.messageType;
+          response.sasHeader.sysId = nameScreeningRequest.sasHeader.sysId;
+          response.sasHeader.timestamp = nameScreeningRequest.sasHeader.timestamp;
+          // response.sasHeader.userId = nameScreeningRequest.sasHeader.userId;
+          response.sasHeader.metaData = nameScreeningRequest.sasHeader.metaData.map((item: any) => ({
+            name: item.name,
+            value: item.value,
+          }));
+      
+          const notification = new Notification();
+          notification.sasHeader = nameScreeningRequest.sasHeader;
 
-        // response.matchDetails
+          // response.matchDetails
 
-        const matchDetails = new MatchDetails();
-        response.matchDetails = matchDetails;
-        matchDetails.details =  {
-          alertId : this.alertId(),
-          alertDetails:  []
-        }; 
-        
-
-        if (nameScreeningRequest.orderingSenderCustomer !== undefined){
-
-
-          const customer = nameScreeningRequest.orderingSenderCustomer;
-
-          if (this.hitNoHit() === 'HIT') { 
-
-            hit = true;
-
-            matchDetails.matchFound = 'HIT'
-            matchDetails.maxScore = this.score();
-            
-            const alertDetail = new AlertDetails();
-            alertDetail.scannedName = customer.fullName;
-            alertDetail.matchedName = customer.fullName;
-            alertDetail.uidSerialNo = this.serialNumber();
-            alertDetail.matchScore = this.score();
-            if (alertDetail.matchScore > matchDetails.maxScore){
-              matchDetails.maxScore = alertDetail.matchScore;
-            }
-            alertDetail.pepFlag = this.pepFlag();
-            alertDetail.watchlistName = this.watchlist();
-            alertDetail.keyword = "PEP~EU~UN~";
-
-            matchDetails.details.alertDetails.push(alertDetail);
-            matchDetails.description = "";
-            // for notification
-            if (alertDetail.pepFlag === 'Y'){
-                // notification.pepReview = 
-                var pepReview : PepReview =
-                {
-                  uid: customer.uid,
-                  idNumber: customer.idNumber,
-                  idType: customer.idType,
-                  reviewFlag: alertDetail.pepFlag,
-                  pepFlag: alertDetail.pepFlag
-              }
-              notification.pepReview.push(pepReview);
-            }
+          const matchDetails = new MatchDetails();
+          response.matchDetails = matchDetails;
+          matchDetails.details =  {
+            alertId : this.alertId(),
+            alertDetails:  []
+          }; 
           
-              const metadata = this.findMetaDataByName(nameScreeningRequest.sasHeader.metaData, CALLBACK);
-              if (metadata) {
-                console.log(`Found object: ${metadata.name} - ${metadata.value}`);
-                notification.alertdecision = this.alertDecision();
-                this.workflowService.callESBAfterinterval(nameScreeningRequest.sasHeader.uniqueTxnRefNo,
-                    metadata.value, notification);
-              } else {
-                console.log("Object not found");
-              }
-          }
-        }
 
-        if ( nameScreeningRequest.beneficiaryReceiverCustomer !== undefined) {
+          matchDetails.status = this.checkStatus();
+          if (matchDetails.status === 'ERROR' ){
 
-                nameScreeningRequest.beneficiaryReceiverCustomer.map((customer: Customer) => {
-                
-                  // matchDetail.matchFound = this.hitNoHit();
-                  // if (matchDetail.matchFound === 'HIT') {
-                  console.log(`Customer Name ${ customer.fullName}`);
-                  matchDetails.uid = customer.uid;
-                
-                  if (this.hitNoHit() === 'HIT') { 
-                    
-                    matchDetails.matchFound = 'HIT'
-                    hit = true;
-                    matchDetails.maxScore = this.score();
-                  
-                    const alertDetail = new AlertDetails();
-                    alertDetail.scannedName = customer.fullName;
-                    alertDetail.matchedName = customer.fullName;
-                    alertDetail.uidSerialNo = this.serialNumber();
-                    alertDetail.matchScore = this.score();
-                    if (alertDetail.matchScore > matchDetails.maxScore){
-                      matchDetails.maxScore = alertDetail.matchScore;
-                    }
-                    alertDetail.pepFlag = this.pepFlag();
-                    alertDetail.watchlistName = this.watchlist();
-                    alertDetail.keyword = "PEP~EU~UN~";
-        
-                    matchDetails.details.alertDetails.push(alertDetail);
-                    matchDetails.description = "";
-                    // for notification
-                    if (alertDetail.pepFlag === 'Y'){
-                        // notification.pepReview = 
-                        var pepReview : PepReview =
-                        {
-                          uid: customer.uid,
-                          idNumber: customer.idNumber,
-                          idType: customer.idType,
-                          reviewFlag: alertDetail.pepFlag,
-                          pepFlag: alertDetail.pepFlag
-                      }
-                      notification.pepReview.push(pepReview);
-                    }
-                  }
-                  // return matchDetails;
-                });
-        }
+              matchDetails.errorCode = this.errorCode();
+              delete response.matchDetails["details"];
 
-        
-
-
-        if (matchDetails.details.alertDetails.length > 0){
-          const metadata = this.findMetaDataByName(nameScreeningRequest.sasHeader.metaData, CALLBACK);
-          if (metadata) {
-            console.log(`Found object: ${metadata.name} - ${metadata.value}`);
-            notification.alertdecision = this.alertDecision();
-            this.workflowService.callESBAfterinterval(nameScreeningRequest.sasHeader.uniqueTxnRefNo,
-                metadata.value, notification);
           } else {
-            console.log("Object not found");
-          }
-        }else{
-          response.matchDetails.matchFound = 'NOHIT';
-          // delete response["matchDetails"];
-          delete response.matchDetails["details"];
+          
+              if (nameScreeningRequest.orderingSenderCustomer !== undefined){
+                const customer = nameScreeningRequest.orderingSenderCustomer;
+                if (this.hitNoHit() === 'HIT') { 
+                  hit = true;
+                  matchDetails.matchFound = 'HIT'
+                  matchDetails.maxScore = this.score();
+                  const alertDetail = new AlertDetails();
+                  alertDetail.scannedName = customer.fullName;
+                  alertDetail.matchedName = customer.fullName;
+                  alertDetail.uidSerialNo = this.serialNumber();
+                  alertDetail.matchScore = this.score();
+                  if (alertDetail.matchScore > matchDetails.maxScore){
+                    matchDetails.maxScore = alertDetail.matchScore;
+                  }
+                  alertDetail.pepFlag = this.pepFlag();
+                  alertDetail.watchlistName = this.watchlist();
+                  alertDetail.keyword = "PEP~EU~UN~";
+
+                  matchDetails.details.alertDetails.push(alertDetail);
+                  matchDetails.description = "";
+                  // for notification
+                  if (alertDetail.pepFlag === 'Y'){
+                      // notification.pepReview = 
+                      var pepReview : PepReview =
+                      {
+                        uid: customer.uid,
+                        idNumber: customer.idNumber,
+                        idType: customer.idType,
+                        reviewFlag: alertDetail.pepFlag,
+                        pepFlag: alertDetail.pepFlag
+                    }
+                    notification.pepReview.push(pepReview);
+                  }
+                
+                    const metadata = this.findMetaDataByName(nameScreeningRequest.sasHeader.metaData, CALLBACK);
+                    if (metadata) {
+                      console.log(`Found object: ${metadata.name} - ${metadata.value}`);
+                      notification.alertdecision = this.alertDecision();
+                      this.workflowService.callESBAfterinterval(nameScreeningRequest.sasHeader.uniqueTxnRefNo,
+                          metadata.value, notification);
+                    } else {
+                      console.log("Object not found");
+                    }
+                }
+              }
+
+              if ( nameScreeningRequest.beneficiaryReceiverCustomer !== undefined) {
+
+                      nameScreeningRequest.beneficiaryReceiverCustomer.map((customer: Customer) => {
+                      
+                        // matchDetail.matchFound = this.hitNoHit();
+                        // if (matchDetail.matchFound === 'HIT') {
+                        console.log(`Customer Name ${ customer.fullName}`);
+                        matchDetails.uid = customer.uid;
+                      
+                        if (this.hitNoHit() === 'HIT') { 
+                          
+                          matchDetails.matchFound = 'HIT'
+                          hit = true;
+                          matchDetails.maxScore = this.score();
+                        
+                          const alertDetail = new AlertDetails();
+                          alertDetail.scannedName = customer.fullName;
+                          alertDetail.matchedName = customer.fullName;
+                          alertDetail.uidSerialNo = this.serialNumber();
+                          alertDetail.matchScore = this.score();
+                          if (alertDetail.matchScore > matchDetails.maxScore){
+                            matchDetails.maxScore = alertDetail.matchScore;
+                          }
+                          alertDetail.pepFlag = this.pepFlag();
+                          alertDetail.watchlistName = this.watchlist();
+                          alertDetail.keyword = "PEP~EU~UN~";
+              
+                          matchDetails.details.alertDetails.push(alertDetail);
+                          matchDetails.description = "";
+                          // for notification
+                          if (alertDetail.pepFlag === 'Y'){
+                              // notification.pepReview = 
+                              var pepReview : PepReview =
+                              {
+                                uid: customer.uid,
+                                idNumber: customer.idNumber,
+                                idType: customer.idType,
+                                reviewFlag: alertDetail.pepFlag,
+                                pepFlag: alertDetail.pepFlag
+                            }
+                            notification.pepReview.push(pepReview);
+                          }
+                        }
+                        // return matchDetails;
+                      });
+              }
+
+              
+
+
+              if (matchDetails.details.alertDetails.length > 0){
+                const metadata = this.findMetaDataByName(nameScreeningRequest.sasHeader.metaData, CALLBACK);
+                if (metadata) {
+                  console.log(`Found object: ${metadata.name} - ${metadata.value}`);
+                  notification.alertdecision = this.alertDecision();
+                  this.workflowService.callESBAfterinterval(nameScreeningRequest.sasHeader.uniqueTxnRefNo,
+                      metadata.value, notification);
+                } else {
+                  console.log("Object not found");
+                }
+              }else{
+                response.matchDetails.matchFound = 'NOHIT';
+                // delete response["matchDetails"];
+                delete response.matchDetails["details"];
+              }
+
         }
       } catch (e) {
         console.log(e.message);  
@@ -241,51 +245,61 @@ export class ScreeningService {
           };
           response.matchDetails = matchDetails;
 
-          
-          // matchDetail.uid = customer.uid;
-          matchDetails.matchFound = this.hitNoHit();
+          matchDetails.status = this.checkStatus();
+          if (matchDetails.status === 'ERROR' ){
 
-          if (matchDetails.matchFound === 'HIT') {
-              hit = true;
-              var details= new Detail();
-              matchDetails.maxScore = this.score();
-              
-            
-              const alertDetail = new AlertDetails();
-              alertDetail.scannedName = customer.name
-              alertDetail.matchedName = customer.name;
-              alertDetail.uidSerialNo = this.serialNumber();
-              alertDetail.matchScore = this.score();
-              if (alertDetail.matchScore > matchDetails.maxScore){
-                matchDetails.maxScore = alertDetail.matchScore;
-              }
-              alertDetail.pepFlag = this.pepFlag();
-              alertDetail.watchlistName = this.watchlist();
-              alertDetail.keyword = "PEP~EU~UN~";
-  
-              matchDetails.details.alertDetails.push(alertDetail);
-              matchDetails.description = "";
-
-              
-          } 
-
-          if (hit){
-            const metadata = this.findMetaDataByName(commonScreeningRequest.sasHeader.metaData, CALLBACK);
-            if (metadata) {
-              console.log(`Found object: ${metadata.name} - ${metadata.value}`);
-              notification.alertdecision = this.alertDecision();
-              this.workflowService.callESBAfterinterval(commonScreeningRequest.sasHeader.uniqueTxnRefNo,
-                  metadata.value, notification);
-            } else {
-              console.log("Not callback URL found");
-            }
-          } else {
-            response.matchDetails.matchFound = 'NOHIT';
-            // delete response["matchDetails"];
+            matchDetails.errorCode = this.errorCode();
             delete response.matchDetails["details"];
 
+          } else {
+          
+              // matchDetail.uid = customer.uid;
+              matchDetails.matchFound = this.hitNoHit();
 
-          }
+              if (matchDetails.matchFound === 'HIT') {
+                  hit = true;
+                  var details= new Detail();
+                  matchDetails.maxScore = this.score();
+                  
+                
+                  const alertDetail = new AlertDetails();
+                  alertDetail.scannedName = customer.name
+                  alertDetail.matchedName = customer.name;
+                  alertDetail.uidSerialNo = this.serialNumber();
+                  alertDetail.matchScore = this.score();
+                  if (alertDetail.matchScore > matchDetails.maxScore){
+                    matchDetails.maxScore = alertDetail.matchScore;
+                  }
+                  alertDetail.pepFlag = this.pepFlag();
+                  alertDetail.watchlistName = this.watchlist();
+                  alertDetail.keyword = "PEP~EU~UN~";
+      
+                  matchDetails.details.alertDetails.push(alertDetail);
+                  matchDetails.description = "";
+
+                  
+              } 
+
+              if (hit){
+                const metadata = this.findMetaDataByName(commonScreeningRequest.sasHeader.metaData, CALLBACK);
+                if (metadata) {
+                  console.log(`Found object: ${metadata.name} - ${metadata.value}`);
+                  notification.alertdecision = this.alertDecision();
+                  this.workflowService.callESBAfterinterval(commonScreeningRequest.sasHeader.uniqueTxnRefNo,
+                      metadata.value, notification);
+                } else {
+                  console.log("Not callback URL found");
+                }
+              } else {
+                response.matchDetails.matchFound = 'NOHIT';
+                // delete response["matchDetails"];
+                delete response.matchDetails["details"];
+
+
+              }
+
+        }// end of if/else error/success
+
     } catch (e) {
       console.log(e.message);  
     }
@@ -325,7 +339,7 @@ findMetaDataByName(array: MetaData[], name: string): MetaData | undefined {
 
   pepFlag(): string{
     var score = Math.floor((Math.random() * 10));
-    if (score > 10){
+    if (score > 5){
       return "Y";
     }
     return "N";
@@ -337,6 +351,22 @@ findMetaDataByName(array: MetaData[], name: string): MetaData | undefined {
       return list[index];
   }
 
+  checkStatus(){
+
+    var score = Math.floor((Math.random() * 10));
+    if (score > 4){
+      return "SUCCESS";
+    }
+    return "ERROR";
+  }
+
+  errorCode():string {
+    var list = ["ERRNS01", "ERRNS02", "ERRNS03", "ERRCS01","ERRCS02", "ERRCS03", "SCRUTLERR", "NSPRSERR",
+                "BCTHUPDTERR", "PMTRSERR", "FSPRSERR", "EQPRSERR", "CMNSCRERR"
+     ];
+    var index = Math.floor((Math.random() * list.length));
+    return list[index];
+  }
 
 
   alertDecision(): string {
