@@ -84,6 +84,10 @@ export class ScreeningService {
                   const alertDetail = new AlertDetails();
                   alertDetail.scannedName = customer.fullName;
                   alertDetail.matchedName = customer.fullName;
+                  console.log(`Customer RIM ${ customer.customer_rim}`);
+                        
+                  alertDetail.customer_rim = customer.customer_rim;
+                  
                   alertDetail.uidSerialNo = this.serialNumber();
                   alertDetail.matchScore = this.score();
                   if (alertDetail.matchScore > matchDetails.maxScore){
@@ -100,7 +104,7 @@ export class ScreeningService {
                       // notification.pepReview = 
                       var pepReview : PepReview =
                       {
-                        uid: customer.uid,
+                        uid: customer.customer_rim,
                         idNumber: customer.idNumber,
                         idType: customer.idType,
                         reviewFlag: alertDetail.pepFlag,
@@ -128,7 +132,8 @@ export class ScreeningService {
                         // matchDetail.matchFound = this.hitNoHit();
                         // if (matchDetail.matchFound === 'HIT') {
                         console.log(`Customer Name ${ customer.fullName}`);
-                        matchDetails.uid = customer.uid;
+                        console.log(`Customer RIM ${ customer.customer_rim}`);
+                        matchDetails.uid = customer.customer_rim;
                       
                         if (this.hitNoHit() === 'HIT') { 
                           
@@ -139,6 +144,7 @@ export class ScreeningService {
                           const alertDetail = new AlertDetails();
                           alertDetail.scannedName = customer.fullName;
                           alertDetail.matchedName = customer.fullName;
+                          alertDetail.customer_rim = customer.customer_rim;
                           alertDetail.uidSerialNo = this.serialNumber();
                           alertDetail.matchScore = this.score();
                           if (alertDetail.matchScore > matchDetails.maxScore){
@@ -155,7 +161,7 @@ export class ScreeningService {
                               // notification.pepReview = 
                               var pepReview : PepReview =
                               {
-                                uid: customer.uid,
+                                uid: customer.customer_rim,
                                 idNumber: customer.idNumber,
                                 idType: customer.idType,
                                 reviewFlag: alertDetail.pepFlag,

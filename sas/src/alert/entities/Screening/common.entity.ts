@@ -79,6 +79,7 @@ export class AlertDetails {
   scannedName: string;
   matchedName: string;
   uidSerialNo: string;
+  customer_rim: string;
   matchScore: number;
   pepFlag: string;
   watchlistName: string;
@@ -101,7 +102,10 @@ export class MatchDetails {
 
 export class Customer {
   @Column()
-  uid: string;
+  customer_rim: string;
+
+  @Column()
+  customerType: string;
 
   @Column()
   idType: string;
