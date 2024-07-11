@@ -375,11 +375,20 @@ findMetaDataByName(array: MetaData[], name: string): MetaData | undefined {
   }
 
 
+  // alertDecision(): string {
+  //   var decision = ["Release", "Reject", "Reject+Block"];
+  //   var index = Math.floor((Math.random() * decision.length));
+  //   return decision[index];
+  // }
+
+
   alertDecision(): string {
-    var decision = ["Release", "Reject", "Reject+Block"];
+    var decision = ["0", "1", "2"];
     var index = Math.floor((Math.random() * decision.length));
     return decision[index];
   }
+
+
 
 
 }
