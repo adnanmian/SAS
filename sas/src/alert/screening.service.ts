@@ -398,7 +398,7 @@ findMetaDataByName(array: MetaData[], name: string): MetaData | undefined {
   checkStatus(){
 
     var score = Math.floor((Math.random() * 10));
-    if (score > 2){
+    if (score > 1){
       return "SUCCESS";
     }
     return "ERROR";
