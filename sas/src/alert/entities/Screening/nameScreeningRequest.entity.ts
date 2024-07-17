@@ -20,6 +20,8 @@ export class NameScreeningRequest {
   beneficiaryReceiverCustomer: Customer[];
 }
 
+
+
 // export class SasHeader {
 //   @Column()
 //   zoneId: string;

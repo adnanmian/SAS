@@ -7,6 +7,8 @@ import { AlertDetails, BeneficiaryCustomer, Customer, CustomerDetails, MatchDeta
 import { CommonScreeningRequest } from './entities/Screening/commonScreeningRequest.entity';
 import { CommonScreeningResponse } from './entities/Screening/commonScreeningResponse.entity';
 import { WorkflowService } from './workflow/workflow.service';
+import { TBMLStatusRequest } from './entities/Screening/tbmlStatusRequest.entity';
+import { TBMLStatusResponse } from './entities/Screening/tbmlStatusResponse.entity';
 
 
 
@@ -313,6 +315,42 @@ export class ScreeningService {
     return response;
   }
 
+  processTBMLStatus(tbmlStatusRequest: TBMLStatusRequest): TBMLStatusResponse {
+    
+    console.log(`Calling TBMLStatus `);
+
+    var hit: boolean = false;
+    const response = new TBMLStatusResponse();
+    try {
+          response.sasHeader = new SasHeader();
+          response.sasHeader.zoneId = tbmlStatusRequest.sasHeader.zoneId;
+          response.sasHeader.regionCode = tbmlStatusRequest.sasHeader.regionCode;
+          response.sasHeader.branchId = tbmlStatusRequest.sasHeader.branchId;
+          response.sasHeader.departmentId = tbmlStatusRequest.sasHeader.departmentId;
+          response.sasHeader.userGroup = tbmlStatusRequest.sasHeader.userGroup;
+          response.sasHeader.channelId = tbmlStatusRequest.sasHeader.channelId;
+          response.sasHeader.applicationId = tbmlStatusRequest.sasHeader.applicationId;
+          response.sasHeader.applicationModule = tbmlStatusRequest.sasHeader.applicationModule;
+          response.sasHeader.uniqueTxnRefNo = tbmlStatusRequest.sasHeader.uniqueTxnRefNo;
+          response.sasHeader.messageType = tbmlStatusRequest.sasHeader.messageType;
+          response.sasHeader.sysId = tbmlStatusRequest.sasHeader.sysId;
+          response.sasHeader.timestamp = tbmlStatusRequest.sasHeader.timestamp;
+          // response.sasHeader.userId = nameScreeningRequest.sasHeader.userId;
+          response.sasHeader.metaData = tbmlStatusRequest.sasHeader.metaData.map((item: any) => ({
+            name: item.name,
+            value: item.value,
+          }));
+      
+          response.status = this.checkStatus();
+          if (response.status === 'ERROR' ){
+              response.errorCode = this.errorCode();
+          }
+      } catch (e) {
+        console.log(e.message);  
+      }
+    return response;
+  }
+
 
 
 // Function to find an object by name
@@ -360,7 +398,7 @@ findMetaDataByName(array: MetaData[], name: string): MetaData | undefined {
   checkStatus(){
 
     var score = Math.floor((Math.random() * 10));
-    if (score > 4){
+    if (score > 2){
       return "SUCCESS";
     }
     return "ERROR";
