@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NameScreeningRequest } from './entities/Screening/nameScreeningRequest.entity';
 import { NameScreeningResponse } from './entities/Screening/nameScreeningResponse.entity';
-import { AlertDetails, BeneficiaryCustomer, Customer, CustomerDetails, MatchDetails, MetaData, SasHeader, Notification, PepReview, Detail } from './entities/Screening/common.entity';
+import { AlertDetails, BeneficiaryCustomer, Customer, CustomerDetails, MatchDetails, MetaData, SasHeader, Notification, PepReview, Detail, Data } from './entities/Screening/common.entity';
 import { CommonScreeningRequest } from './entities/Screening/commonScreeningRequest.entity';
 import { CommonScreeningResponse } from './entities/Screening/commonScreeningResponse.entity';
 import { WorkflowService } from './workflow/workflow.service';
@@ -12,7 +12,7 @@ import { TBMLStatusResponse } from './entities/Screening/tbmlStatusResponse.enti
 
 
 
-const CALLBACK : string = "Callback";
+const CALLBACK : string = "returnURL";
 
 @Injectable()
 export class ScreeningService {
@@ -35,23 +35,30 @@ export class ScreeningService {
   createNameScreeningResponse(nameScreeningRequest: NameScreeningRequest): NameScreeningResponse {
     
     var hit: boolean = false;
+
+    const data = new Data();
+
+
     const response = new NameScreeningResponse();
     try {
-          response.sasHeader = new SasHeader();
-          response.sasHeader.zoneId = nameScreeningRequest.sasHeader.zoneId;
-          response.sasHeader.regionCode = nameScreeningRequest.sasHeader.regionCode;
-          response.sasHeader.branchId = nameScreeningRequest.sasHeader.branchId;
-          response.sasHeader.departmentId = nameScreeningRequest.sasHeader.departmentId;
-          response.sasHeader.userGroup = nameScreeningRequest.sasHeader.userGroup;
-          response.sasHeader.channelId = nameScreeningRequest.sasHeader.channelId;
-          response.sasHeader.applicationId = nameScreeningRequest.sasHeader.applicationId;
-          response.sasHeader.applicationModule = nameScreeningRequest.sasHeader.applicationModule;
-          response.sasHeader.uniqueTxnRefNo = nameScreeningRequest.sasHeader.uniqueTxnRefNo;
-          response.sasHeader.messageType = nameScreeningRequest.sasHeader.messageType;
-          response.sasHeader.sysId = nameScreeningRequest.sasHeader.sysId;
-          response.sasHeader.timestamp = nameScreeningRequest.sasHeader.timestamp;
+
+        response.data = data;
+
+          response.data.sasHeader = new SasHeader();
+          response.data.sasHeader.zoneId = nameScreeningRequest.sasHeader.zoneId;
+          response.data.sasHeader.regionCode = nameScreeningRequest.sasHeader.regionCode;
+          response.data.sasHeader.branchId = nameScreeningRequest.sasHeader.branchId;
+          response.data.sasHeader.departmentId = nameScreeningRequest.sasHeader.departmentId;
+          response.data.sasHeader.userGroup = nameScreeningRequest.sasHeader.userGroup;
+          response.data.sasHeader.channelId = nameScreeningRequest.sasHeader.channelId;
+          response.data.sasHeader.applicationId = nameScreeningRequest.sasHeader.applicationId;
+          response.data.sasHeader.applicationModule = nameScreeningRequest.sasHeader.applicationModule;
+          response.data.sasHeader.uniqueTxnRefNo = nameScreeningRequest.sasHeader.uniqueTxnRefNo;
+          response.data.sasHeader.messageType = nameScreeningRequest.sasHeader.messageType;
+          response.data.sasHeader.sysId = nameScreeningRequest.sasHeader.sysId;
+          response.data.sasHeader.timestamp = nameScreeningRequest.sasHeader.timestamp;
           // response.sasHeader.userId = nameScreeningRequest.sasHeader.userId;
-          response.sasHeader.metaData = nameScreeningRequest.sasHeader.metaData.map((item: any) => ({
+          response.data.sasHeader.metaData = nameScreeningRequest.sasHeader.metaData.map((item: any) => ({
             name: item.name,
             value: item.value,
           }));
@@ -62,7 +69,8 @@ export class ScreeningService {
           // response.matchDetails
 
           const matchDetails = new MatchDetails();
-          response.matchDetails = matchDetails;
+          response.data.matchDetails  = matchDetails;
+          response.data.matchDetails = matchDetails;
           matchDetails.details =  {
             alertId : this.alertId(),
             alertDetails:  []
@@ -73,7 +81,7 @@ export class ScreeningService {
           if (matchDetails.status === 'ERROR' ){
 
               matchDetails.errorCode = this.errorCode();
-              delete response.matchDetails["details"];
+              delete response.data.matchDetails["details"];
 
           } else {
           
@@ -190,9 +198,9 @@ export class ScreeningService {
                   console.log("Object not found");
                 }
               }else{
-                response.matchDetails.matchFound = 'NOHIT';
+                response.data.matchDetails.matchFound = 'NOHIT';
                 // delete response["matchDetails"];
-                delete response.matchDetails["details"];
+                delete response.data.matchDetails["details"];
               }
 
         }
@@ -398,6 +406,7 @@ findMetaDataByName(array: MetaData[], name: string): MetaData | undefined {
   checkStatus(){
 
     var score = Math.floor((Math.random() * 10));
+    console.log(`Error Score ${ score }`);
     if (score > 1){
       return "SUCCESS";
     }

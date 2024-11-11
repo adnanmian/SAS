@@ -24,6 +24,17 @@ export class PepReview {
 }
 
 
+export class Data{
+  sasHeader: SasHeader;
+  matchDetails: MatchDetail;
+}
+
+export class ReturnStatus{
+  returnCode: string;
+  returnCodeDesc: string;
+}
+
+
 export class SasHeader {
   @Column()
   zoneId: string;
@@ -1004,3 +1015,5 @@ export class LcBillsLodgementSightSettlementsAcceptance {
   otherThirdPartyOrPlace: string[]
   chamberOfCommerce: string
 }
+
+

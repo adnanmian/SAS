@@ -1,17 +1,29 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { MatchDetail, SasHeader } from './common.entity';
+import { Data, MatchDetail, ReturnStatus, SasHeader } from './common.entity';
 
 @Entity()
 export class NameScreeningResponse {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column(type => SasHeader)
-  sasHeader: SasHeader;
-
-  @Column(type => MatchDetail)
-  matchDetails: MatchDetail;
+  data: Data;
+  returnStatus: ReturnStatus;
 }
+
+
+
+// @Entity()
+// export class NameScreeningResponse {
+//   @PrimaryGeneratedColumn()
+//   id: number;
+
+//   @Column(type => SasHeader)
+//   sasHeader: SasHeader;
+
+//   @Column(type => MatchDetail)
+//   matchDetails: MatchDetail;
+// }
+
 
 // export class SasHeader {
 //   @Column()
