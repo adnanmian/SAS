@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NameScreeningRequest } from './entities/Screening/nameScreeningRequest.entity';
 import { NameScreeningResponse } from './entities/Screening/nameScreeningResponse.entity';
-import { AlertDetails, BeneficiaryCustomer, Customer, CustomerDetails, MatchDetails, MetaData, SasHeader, Notification, PepReview, Detail, Data } from './entities/Screening/common.entity';
+import { AlertDetails, BeneficiaryCustomer, Customer, CustomerDetails, MatchDetails, MetaData, SasHeader, Notification, PepReview, Detail, Data, ReturnStatus } from './entities/Screening/common.entity';
 import { CommonScreeningRequest } from './entities/Screening/commonScreeningRequest.entity';
 import { CommonScreeningResponse } from './entities/Screening/commonScreeningResponse.entity';
 import { WorkflowService } from './workflow/workflow.service';
@@ -37,12 +37,16 @@ export class ScreeningService {
     var hit: boolean = false;
 
     const data = new Data();
-
+    const returnStatus = new ReturnStatus();
+    returnStatus.returnCode = "M000";
+    returnStatus.returnCodeDesc = "OK";
 
     const response = new NameScreeningResponse();
     try {
 
         response.data = data;
+        response.returnStatus = returnStatus;
+
 
           response.data.sasHeader = new SasHeader();
           response.data.sasHeader.zoneId = nameScreeningRequest.sasHeader.zoneId;
@@ -120,7 +124,7 @@ export class ScreeningService {
                         reviewFlag: alertDetail.pepFlag,
                         pepFlag: alertDetail.pepFlag
                     }
-                    notification.pepReview.push(pepReview);
+                    // notification.pepReview.push(pepReview);
                   }
                 
                     const metadata = this.findMetaDataByName(nameScreeningRequest.sasHeader.metaData, CALLBACK);
@@ -177,7 +181,7 @@ export class ScreeningService {
                                 reviewFlag: alertDetail.pepFlag,
                                 pepFlag: alertDetail.pepFlag
                             }
-                            notification.pepReview.push(pepReview);
+                            // notification.pepReview.push(pepReview);
                           }
                         }
                         // return matchDetails;
@@ -430,7 +434,7 @@ findMetaDataByName(array: MetaData[], name: string): MetaData | undefined {
 
 
   alertDecision(): string {
-    var decision = ["0", "1", "2"];
+    var decision = ["0", "1"];
     var index = Math.floor((Math.random() * decision.length));
     return decision[index];
   }

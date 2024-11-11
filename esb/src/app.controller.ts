@@ -17,7 +17,9 @@ export class AppController {
   receiveNotification(@Body() notification: Notification){
     
     
-    this.logger.log(`Notification \n ${  JSON.stringify(notification)}`);
+    this.logger.log(`Notification \n ${  JSON.stringify(notification, null, 2) }`);
+    
+    //this.logger.log(`Notification \n ${  JSON.stringify(notification)}`);
     
     // console.log(`Notification received ${ JSON.stringify(notification) }`);
  

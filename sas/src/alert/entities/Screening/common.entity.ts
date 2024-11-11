@@ -7,9 +7,6 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 export class Notification {
   sasHeader: SasHeader
   alertdecision: string
-  createSTRFlag: string
-  createRFIFlag: string
-  pepReview: PepReview[]
   alertId: string
   finalComments: string
 }
